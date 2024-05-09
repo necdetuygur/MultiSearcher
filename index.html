@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi Searcher</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Fira+Sans:wght@200;300;400;500;600;700;800;900;1000&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;500;600;700;800;900;1000&display=swap");
+
+      :root {
+        color-scheme: light dark;
+
+        --light-bg: #ffffff;
+        --light-color: #030e13;
+
+        --dark-bg: #030e13;
+        --dark-color: #ffffff;
+      }
+
+      body {
+        background-color: light-dark(var(--light-bg), var(--dark-bg));
+        color: light-dark(var(--light-color), var(--dark-color));
+        font-family: "Fira Sans", sans-serif;
+      }
+
+      input {
+        font-family: "JetBrains Mono";
+        padding: 5px;
+        font-size: 2rem;
+        box-sizing: border-box;
+        width: 100%;
+        margin-bottom: 5px;
+      }
+
+      textarea {
+        font-family: "JetBrains Mono";
+        padding: 5px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        width: 100%;
+        height: 300px;
+        margin-bottom: 5px;
+      }
+
+      label {
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Multi Searcher</h1>
+    <textarea onkeyup="textareaKeyUp(this.value)"></textarea>
+
+    <input
+      type="text"
+      onkeypress="event.keyCode == 13 && inputOnKeyPress(this.value)"
+      placeholder="Search Query"
+    />
+
+    <script>
+      window.addEventListener("load", () => {
+        document.querySelector("input").focus();
+        document.querySelector("input").select();
+        document.querySelector("textarea").value =
+          localStorage.getItem("multisearcher") ||
+          "youtube\nhdfilmcehennemi\nakakçe\ncimri\nepey\n";
+      });
+
+      const inputOnKeyPress = (value) => {
+        if (value) {
+          const sites = document.querySelector("textarea").value.split("\n");
+          for (const i of sites) {
+            window.open(
+              `https://www.google.com/search?q="${i.trim()}" ${value}`
+            );
+          }
+        }
+      };
+
+      const textareaKeyUp = (value) => {
+        if (value) {
+          localStorage.setItem("multisearcher", value);
+        }
+      };
+    </script>
+  </body>
+</html>
