@@ -71,9 +71,11 @@
         if (value) {
           const sites = document.querySelector("textarea").value.split("\n");
           for (const i of sites) {
-            window.open(
-              `https://www.google.com/search?q="${i.trim()}" ${value}`
-            );
+            if (i.trim()) {
+              window.open(
+                `https://www.google.com/search?q="${i.trim()}" ${value}`
+              );
+            }
           }
         }
       };
