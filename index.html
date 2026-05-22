@@ -9,85 +9,214 @@
 
       :root {
         color-scheme: light dark;
-
         --light-bg: #ffffff;
         --light-color: #112233;
-
         --dark-bg: #112233;
         --dark-color: #ffffff;
       }
+
+      * { box-sizing: border-box; }
 
       body {
         background-color: light-dark(var(--light-bg), var(--dark-bg));
         color: light-dark(var(--light-color), var(--dark-color));
         font-family: "Fira Sans", sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
       }
 
-      input {
-        font-family: "Fira Sans";
-        padding: 5px;
-        font-size: 2rem;
-        box-sizing: border-box;
-        width: 100%;
+      h1 { margin-bottom: 20px; }
+
+      label {
+        display: block;
         margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      select, input, textarea, button {
+        font-family: "Fira Sans";
+        padding: 8px;
         background: #ffffff22;
         border: 1px solid #ffffff55;
+        color: inherit;
+        border-radius: 4px;
+      }
+
+      select, input, textarea {
+        width: 100%;
+      }
+
+      select {
+        font-size: 1rem;
+        margin-bottom: 12px;
+        cursor: pointer;
+      }
+
+      select option {
+        background: #112233;
+        color: #ffffff;
+      }
+
+      .search-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .search-row input {
+        flex: 1;
+        margin-bottom: 0;
+        font-size: 2rem;
+        padding: 5px;
+      }
+
+      .search-row button {
+        font-size: 1.2rem;
+        padding: 5px 24px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .search-row button:hover {
+        background: #ffffff44;
+      }
+
+      .search-row button:active {
+        background: #ffffff55;
       }
 
       textarea {
-        font-family: "Fira Sans";
-        padding: 5px;
-        font-size: 1rem;
-        box-sizing: border-box;
-        width: 100%;
         height: 300px;
         margin-bottom: 5px;
-        background: #ffffff22;
-        border: 1px solid #ffffff55;
+        resize: vertical;
+        font-size: 1rem;
+        padding: 5px;
       }
 
-      label {
-        margin-bottom: 5px;
+      @media (max-width: 500px) {
+        .search-row { flex-direction: column; }
+        .search-row button { width: 100%; }
       }
     </style>
   </head>
   <body>
     <h1>Multi Searcher</h1>
-    <textarea onkeyup="textareaKeyUp(this.value)"></textarea>
 
-    <input
-      type="text"
-      onkeypress="event.keyCode == 13 && inputOnKeyPress(this.value)"
-      placeholder="Search Query"
-    />
+    <label for="searchEngine">Search Engine</label>
+    <select id="searchEngine">
+      <option value="google">Google</option>
+      <option value="duckduckgo">DuckDuckGo</option>
+      <option value="bing">Bing</option>
+      <option value="brave">Brave Search</option>
+      <option value="perplexity">Perplexity</option>
+      <option value="chatgpt">ChatGPT</option>
+      <option value="claude">Claude</option>
+      <option value="gemini">Gemini</option>
+      <option value="yandex">Yandex</option>
+    </select>
+
+    <label for="searchQuery">Search Query</label>
+    <div class="search-row">
+      <input type="text" id="searchQuery" list="historyList" placeholder="Search Query" />
+      <datalist id="historyList"></datalist>
+      <button id="searchBtn">Search</button>
+    </div>
+
+    <label for="sitesTextarea">Sites (one per line)</label>
+    <textarea id="sitesTextarea"></textarea>
 
     <script>
-      window.addEventListener("load", () => {
-        document.querySelector("input").focus();
-        document.querySelector("input").select();
-        document.querySelector("textarea").value =
-          localStorage.getItem("multisearcher") ||
-          "youtube\nhdfilmcehennemi\nakakçe\ncimri\nepey\n";
-      });
+      const ENGINES = {
+        google:     (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://www.google.com/search?${p}`; },
+        duckduckgo: (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://duckduckgo.com/?${p}`; },
+        bing:       (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://www.bing.com/search?${p}`; },
+        brave:      (s, q) => { const p = new URLSearchParams(); p.set('q', `${s} ${q}`); return `https://search.brave.com/search?${p}`; },
+        perplexity: (s, q) => { const p = new URLSearchParams(); p.set('q', `${s} ${q}`); return `https://www.perplexity.ai/search?${p}`; },
+        chatgpt:    (s, q) => { const p = new URLSearchParams(); p.set('q', `${q} on ${s}`); p.set('hints', 'search'); return `https://chatgpt.com/?${p}`; },
+        claude:     (s, q) => { const p = new URLSearchParams(); p.set('q', `Find information about ${q} on ${s}`); return `https://claude.ai/new?${p}`; },
+        gemini:     () => 'https://gemini.google.com/',
+        yandex:     (s, q) => { const p = new URLSearchParams(); p.set('text', `${s} ${q}`); return `https://yandex.com/search/?${p}`; },
+      };
 
-      const inputOnKeyPress = (value) => {
-        if (value) {
-          const sites = document.querySelector("textarea").value.split("\n");
-          for (const i of sites) {
-            if (i.trim()) {
-              window.open(
-                `https://www.google.com/search?q="${i.trim()}" ${value}`
-              );
-            }
+      const SITES_KEY = 'multisearcher';
+      const ENGINE_KEY = 'selectedEngine';
+      const HISTORY_KEY = 'multisearcherHistory';
+      const MAX_HISTORY = 10;
+
+      const engineSelect = document.getElementById('searchEngine');
+      const queryInput = document.getElementById('searchQuery');
+      const searchBtn = document.getElementById('searchBtn');
+      const sitesTextarea = document.getElementById('sitesTextarea');
+      const historyList = document.getElementById('historyList');
+
+      const getHistory = () => {
+        try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+        catch { return []; }
+      };
+
+      const renderHistory = () => {
+        historyList.innerHTML = '';
+        for (const h of getHistory()) {
+          const opt = document.createElement('option');
+          opt.value = h;
+          historyList.appendChild(opt);
+        }
+      };
+
+      const addToHistory = (q) => {
+        let h = getHistory().filter(x => x !== q);
+        h.unshift(q);
+        if (h.length > MAX_HISTORY) h = h.slice(0, MAX_HISTORY);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+        renderHistory();
+      };
+
+      const performSearch = () => {
+        const q = queryInput.value.trim();
+        if (!q) return;
+
+        const engine = engineSelect.value;
+        const sites = sitesTextarea.value.split('\n').filter(s => s.trim());
+
+        if (engine === 'gemini') {
+          alert('Gemini does not support URL query parameters.\nThe Gemini homepage will be opened.\nUse @gemini in Chrome address bar as a workaround.');
+          window.open('https://gemini.google.com/');
+        } else {
+          for (const site of sites) {
+            const url = ENGINES[engine](site.trim(), q);
+            window.open(url);
           }
         }
+
+        addToHistory(q);
       };
 
-      const textareaKeyUp = (value) => {
-        if (value) {
-          localStorage.setItem("multisearcher", value);
-        }
-      };
+      queryInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch();
+      });
+
+      searchBtn.addEventListener('click', performSearch);
+
+      engineSelect.addEventListener('change', () => {
+        localStorage.setItem(ENGINE_KEY, engineSelect.value);
+      });
+
+      sitesTextarea.addEventListener('input', () => {
+        localStorage.setItem(SITES_KEY, sitesTextarea.value);
+      });
+
+      window.addEventListener('load', () => {
+        const saved = localStorage.getItem(ENGINE_KEY);
+        if (saved && ENGINES[saved]) engineSelect.value = saved;
+
+        sitesTextarea.value = localStorage.getItem(SITES_KEY) ||
+          'youtube\nhdfilmcehennemi\nakakçe\ncimri\nepey\n';
+
+        renderHistory();
+        queryInput.focus();
+        queryInput.select();
+      });
     </script>
   </body>
 </html>
