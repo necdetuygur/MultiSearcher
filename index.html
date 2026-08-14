@@ -30,12 +30,39 @@
         background-color: light-dark(var(--light-bg), var(--dark-bg));
         color: light-dark(var(--light-color), var(--dark-color));
         font-family: "Asap", sans-serif;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
+        margin: 0;
       }
 
-      h1 { margin-bottom: 20px; }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 16px;
+      }
+
+      .app-header {
+        background: var(--header-bg);
+        color: #ffffff;
+        padding: 14px 20px;
+      }
+
+      .app-header-inner {
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .app-header h1 {
+        font-size: 1.4rem;
+        margin: 0;
+        font-weight: 600;
+      }
+
+      .header-icon {
+        font-size: 1.6rem;
+        line-height: 1;
+      }
 
       label {
         display: block;
@@ -110,11 +137,24 @@
         .search-row { flex-direction: column; }
         .search-row button { width: 100%; }
       }
+
+      @media (max-width: 480px) {
+        .app-header { padding: 10px 16px; }
+        .app-header h1 { font-size: 1.15rem; }
+        .header-icon { font-size: 1.3rem; }
+        .container { padding: 12px; }
+      }
     </style>
   </head>
   <body>
-    <h1>Multi Searcher</h1>
+    <header class="app-header">
+      <div class="app-header-inner">
+        <span class="header-icon" aria-hidden="true">🔍</span>
+        <h1>Multi Searcher</h1>
+      </div>
+    </header>
 
+    <main class="container">
     <label for="searchEngine">Search Engine</label>
     <select id="searchEngine">
       <option value="google">Google</option>
@@ -137,6 +177,7 @@
 
     <label for="sitesTextarea">Sites (one per line)</label>
     <textarea id="sitesTextarea"></textarea>
+    </main>
 
     <script>
       const ENGINES = {
