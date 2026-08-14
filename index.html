@@ -133,6 +133,12 @@
         padding: 5px;
       }
 
+      .sites-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 12px;
+      }
+
       @media (max-width: 500px) {
         .search-row { flex-direction: column; }
         .search-row button { width: 100%; }
@@ -177,6 +183,9 @@
 
     <label for="sitesTextarea">Sites (one per line)</label>
     <textarea id="sitesTextarea"></textarea>
+    <div class="sites-actions">
+      <button id="resetBtn" type="button">Restore Defaults</button>
+    </div>
     </main>
 
     <script>
@@ -192,6 +201,8 @@
         yandex:     (s, q) => { const p = new URLSearchParams(); p.set('text', `${s} ${q}`); return `https://yandex.com/search/?${p}`; },
       };
 
+      const DEFAULT_SITES = 'youtube\nhdfilmcehennemi\nakakçe\ncimri\nepey\n';
+
       const SITES_KEY = 'multisearcher';
       const ENGINE_KEY = 'selectedEngine';
       const HISTORY_KEY = 'multisearcherHistory';
@@ -202,6 +213,7 @@
       const searchBtn = document.getElementById('searchBtn');
       const sitesTextarea = document.getElementById('sitesTextarea');
       const historyList = document.getElementById('historyList');
+      const resetBtn = document.getElementById('resetBtn');
 
       const getHistory = () => {
         try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
@@ -259,6 +271,14 @@
         localStorage.setItem(SITES_KEY, sitesTextarea.value);
       });
 
+      resetBtn.addEventListener('click', () => {
+        if (confirm('Restore the default sites? This will replace the current list.')) {
+          sitesTextarea.value = DEFAULT_SITES;
+          localStorage.removeItem(SITES_KEY);
+          sitesTextarea.focus();
+        }
+      });
+
       const setEmojiFavicon = (emoji = "🔍") => {
         const canvas = document.createElement("canvas");
         canvas.width = 64;
@@ -277,8 +297,7 @@
         const saved = localStorage.getItem(ENGINE_KEY);
         if (saved && ENGINES[saved]) engineSelect.value = saved;
 
-        sitesTextarea.value = localStorage.getItem(SITES_KEY) ||
-          'youtube\nhdfilmcehennemi\nakakçe\ncimri\nepey\n';
+        sitesTextarea.value = localStorage.getItem(SITES_KEY) || DEFAULT_SITES;
 
         renderHistory();
         queryInput.focus();
