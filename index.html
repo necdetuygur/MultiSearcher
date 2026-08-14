@@ -11,10 +11,17 @@
 
       :root {
         color-scheme: light dark;
-        --light-bg: #ffffff;
+        --light-bg: #eef2f6;
         --light-color: #112233;
+        --light-panel: #ffffff;
+        --light-border: #11223333;
         --dark-bg: #112233;
-        --dark-color: #ffffff;
+        --dark-color: #e8eef4;
+        --dark-panel: #16283d;
+        --dark-border: #ffffff33;
+        --accent: light-dark(#2a4a72, #4a7fb5);
+        --accent-hover: light-dark(#1f3755, #5a92c9);
+        --header-bg: #0d1b2a;
       }
 
       * { box-sizing: border-box; }
@@ -39,8 +46,8 @@
       select, input, textarea, button {
         font-family: "Asap", sans-serif;
         padding: 8px;
-        background: #ffffff22;
-        border: 1px solid #ffffff55;
+        background: light-dark(var(--light-panel), var(--dark-panel));
+        border: 1px solid light-dark(var(--light-border), var(--dark-border));
         color: inherit;
         border-radius: 4px;
       }
@@ -56,8 +63,8 @@
       }
 
       select option {
-        background: #112233;
-        color: #ffffff;
+        background: light-dark(var(--light-panel), #112233);
+        color: light-dark(#112233, #ffffff);
       }
 
       .search-row {
@@ -78,14 +85,17 @@
         padding: 5px 24px;
         cursor: pointer;
         font-weight: 500;
+        background: var(--accent);
+        border-color: transparent;
+        color: #ffffff;
       }
 
       .search-row button:hover {
-        background: #ffffff44;
+        background: var(--accent-hover);
       }
 
       .search-row button:active {
-        background: #ffffff55;
+        opacity: 0.85;
       }
 
       textarea {
