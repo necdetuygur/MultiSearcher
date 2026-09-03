@@ -6,43 +6,47 @@
     <title>Multi Searcher</title>
     <link id="dynamic-favicon" rel="icon" href="" />
     <meta name="google" content="notranslate" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Asap:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Asap:wght@400;500;600;700&display=swap");
-
       :root {
-        color-scheme: light dark;
-        --light-bg: #eef2f6;
-        --light-color: #112233;
-        --light-panel: #ffffff;
-        --light-border: #11223333;
-        --dark-bg: #112233;
-        --dark-color: #e8eef4;
-        --dark-panel: #16283d;
-        --dark-border: #ffffff33;
-        --accent: light-dark(#2a4a72, #4a7fb5);
-        --accent-hover: light-dark(#1f3755, #5a92c9);
-        --header-bg: #0d1b2a;
+        color-scheme: dark;
+        --bg: #0f1a26;
+        --panel: #112233;
+        --border: #1a334d;
+        --text: #b8c5d6;
+        --text-muted: #5a8db8;
+        --text-dim: #5a6b80;
+        --accent: #2a5a8a;
+        --accent-hover: #3a6d9d;
+        --accent-active: #1f4a72;
+        --input-bg: #0a1219;
+        --header-bg: #112233;
       }
 
-      * { box-sizing: border-box; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
       body {
-        background-color: light-dark(var(--light-bg), var(--dark-bg));
-        color: light-dark(var(--light-color), var(--dark-color));
         font-family: "Asap", sans-serif;
-        margin: 0;
-      }
-
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 16px;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
 
       .app-header {
         background: var(--header-bg);
-        color: #ffffff;
-        padding: 14px 20px;
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 10;
       }
 
       .app-header-inner {
@@ -54,67 +58,93 @@
       }
 
       .app-header h1 {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         margin: 0;
         font-weight: 600;
+        color: #7d9db8;
+        letter-spacing: 0.02em;
       }
 
       .header-icon {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
         line-height: 1;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+        flex: 1;
       }
 
       label {
         display: block;
-        margin-bottom: 5px;
+        margin-bottom: 6px;
         font-weight: 500;
-      }
-
-      select, input, textarea, button {
-        font-family: "Asap", sans-serif;
-        padding: 8px;
-        background: light-dark(var(--light-panel), var(--dark-panel));
-        border: 1px solid light-dark(var(--light-border), var(--dark-border));
-        color: inherit;
-        border-radius: 4px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        letter-spacing: 0.03em;
       }
 
       select, input, textarea {
+        font-family: "Asap", sans-serif;
+        padding: 0.55rem 0.75rem;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 6px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
         width: 100%;
       }
 
+      select:focus, input:focus, textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(42, 90, 138, 0.25);
+      }
+
       select {
-        font-size: 1rem;
-        margin-bottom: 12px;
         cursor: pointer;
+        margin-bottom: 1.25rem;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a8db8' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 2rem;
       }
 
       select option {
-        background: light-dark(var(--light-panel), #112233);
-        color: light-dark(#112233, #ffffff);
+        background: var(--panel);
+        color: var(--text);
       }
 
       .search-row {
         display: flex;
-        gap: 8px;
-        margin-bottom: 12px;
+        gap: 10px;
+        margin-bottom: 1.25rem;
       }
 
       .search-row input {
         flex: 1;
         margin-bottom: 0;
-        font-size: 2rem;
-        padding: 5px;
+        font-size: 1.5rem;
+        padding: 0.6rem 0.85rem;
       }
 
       .search-row button {
-        font-size: 1.2rem;
-        padding: 5px 24px;
+        font-family: "Asap", sans-serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 0.6rem 2rem;
         cursor: pointer;
-        font-weight: 500;
         background: var(--accent);
-        border-color: transparent;
+        border: 1px solid transparent;
         color: #ffffff;
+        border-radius: 6px;
+        transition: background 0.2s, transform 0.1s;
+        white-space: nowrap;
       }
 
       .search-row button:hover {
@@ -122,15 +152,15 @@
       }
 
       .search-row button:active {
-        opacity: 0.85;
+        background: var(--accent-active);
+        transform: translateY(1px);
       }
 
       textarea {
         height: 160px;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
         resize: vertical;
-        font-size: 1rem;
-        padding: 5px;
+        line-height: 1.6;
       }
 
       .sites-actions {
@@ -139,16 +169,39 @@
         margin-bottom: 12px;
       }
 
+      .sites-actions button {
+        font-family: "Asap", sans-serif;
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.9rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+      }
+
+      .sites-actions button:hover {
+        background: var(--panel);
+        border-color: var(--text-muted);
+        color: var(--text);
+      }
+
+      .sites-actions button:active {
+        transform: translateY(1px);
+      }
+
       @media (max-width: 500px) {
         .search-row { flex-direction: column; }
         .search-row button { width: 100%; }
       }
 
       @media (max-width: 480px) {
-        .app-header { padding: 10px 16px; }
-        .app-header h1 { font-size: 1.15rem; }
-        .header-icon { font-size: 1.3rem; }
-        .container { padding: 12px; }
+        .app-header { padding: 0.6rem 1rem; }
+        .app-header h1 { font-size: 1.1rem; }
+        .header-icon { font-size: 1.25rem; }
+        .container { padding: 1.25rem 1rem; }
+        .search-row input { font-size: 1.2rem; }
       }
     </style>
   </head>
