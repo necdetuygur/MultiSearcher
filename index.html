@@ -290,6 +290,7 @@
           <select id="settingsEngine">
             <option value="google">Google</option>
             <option value="duckduckgo">DuckDuckGo</option>
+            <option value="duckduckgonoai">DuckDuckGo No-AI</option>
             <option value="bing">Bing</option>
             <option value="brave">Brave Search</option>
             <option value="perplexity">Perplexity</option>
@@ -325,15 +326,16 @@
 
     <script>
       const ENGINES = {
-        google:     (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://www.google.com/search?${p}`; },
-        duckduckgo: (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://duckduckgo.com/?${p}`; },
-        bing:       (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://www.bing.com/search?${p}`; },
-        brave:      (s, q) => { const p = new URLSearchParams(); p.set('q', `${s} ${q}`); return `https://search.brave.com/search?${p}`; },
-        perplexity: (s, q) => { const p = new URLSearchParams(); p.set('q', `${s} ${q}`); return `https://www.perplexity.ai/search?${p}`; },
-        chatgpt:    (s, q) => { const p = new URLSearchParams(); p.set('q', `${q} on ${s}`); p.set('hints', 'search'); return `https://chatgpt.com/?${p}`; },
-        claude:     (s, q) => { const p = new URLSearchParams(); p.set('q', `Find information about ${q} on ${s}`); return `https://claude.ai/new?${p}`; },
-        gemini:     () => 'https://gemini.google.com/',
-        yandex:     (s, q) => { const p = new URLSearchParams(); p.set('text', `${s} ${q}`); return `https://yandex.com/search/?${p}`; },
+        google:         (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://www.google.com/search?${p}`; },
+        duckduckgo:     (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://duckduckgo.com/?${p}`; },
+        duckduckgonoai: (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://noai.duckduckgo.com/?${p}`; },
+        bing:           (s, q) => { const p = new URLSearchParams(); p.set('q', `"${s}" ${q}`); return `https://www.bing.com/search?${p}`; },
+        brave:          (s, q) => { const p = new URLSearchParams(); p.set('q', `${s} ${q}`); return `https://search.brave.com/search?${p}`; },
+        perplexity:     (s, q) => { const p = new URLSearchParams(); p.set('q', `${s} ${q}`); return `https://www.perplexity.ai/search?${p}`; },
+        chatgpt:        (s, q) => { const p = new URLSearchParams(); p.set('q', `${q} on ${s}`); p.set('hints', 'search'); return `https://chatgpt.com/?${p}`; },
+        claude:         (s, q) => { const p = new URLSearchParams(); p.set('q', `Find information about ${q} on ${s}`); return `https://claude.ai/new?${p}`; },
+        gemini:         () => 'https://gemini.google.com/',
+        yandex:         (s, q) => { const p = new URLSearchParams(); p.set('text', `${s} ${q}`); return `https://yandex.com/search/?${p}`; },
       };
 
       const DEFAULT_SITES = 'hdfilmcehennemi\nyoutube\nakakçe\ncimri\nepey\n';
