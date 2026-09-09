@@ -23,6 +23,8 @@
         --accent-active: #1f4a72;
         --input-bg: #0a1219;
         --header-bg: #112233;
+        --warning: #c07020;
+        --warning-bg: rgba(192, 112, 32, 0.1);
       }
 
       * {
@@ -70,6 +72,29 @@
         line-height: 1;
       }
 
+      .header-settings-btn {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        font-size: 1.3rem;
+        cursor: pointer;
+        border-radius: 6px;
+        padding: 0.3rem 0.6rem;
+        line-height: 1;
+        transition: all 0.2s;
+      }
+
+      .header-settings-btn:hover {
+        background: var(--panel);
+        border-color: var(--text-muted);
+        color: var(--text);
+      }
+
+      .header-settings-btn:active {
+        transform: translateY(1px);
+      }
+
       .container {
         max-width: 800px;
         width: 100%;
@@ -77,6 +102,8 @@
         padding: 2rem 1.5rem;
         flex: 1;
       }
+
+      .hidden { display: none !important; }
 
       label {
         display: block;
@@ -191,6 +218,45 @@
         transform: translateY(1px);
       }
 
+      .settings-done-btn {
+        font-family: "Asap", sans-serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 0.65rem 2.5rem;
+        cursor: pointer;
+        background: var(--accent);
+        border: 1px solid transparent;
+        color: #ffffff;
+        border-radius: 6px;
+        transition: background 0.2s, transform 0.1s;
+        margin-top: 1.5rem;
+        width: 100%;
+      }
+
+      .settings-done-btn:hover {
+        background: var(--accent-hover);
+      }
+
+      .settings-done-btn:active {
+        background: var(--accent-active);
+        transform: translateY(1px);
+      }
+
+      .warning-text {
+        color: var(--warning);
+        font-size: 0.8rem;
+        margin-top: -0.6rem;
+        margin-bottom: 1.25rem;
+        padding: 0.45rem 0.65rem;
+        background: var(--warning-bg);
+        border-radius: 4px;
+        display: none;
+      }
+
+      .settings-section {
+        margin-bottom: 1.5rem;
+      }
+
       @media (max-width: 500px) {
         .search-row { flex-direction: column; }
         .search-row button { width: 100%; }
@@ -210,35 +276,57 @@
       <div class="app-header-inner">
         <span class="header-icon" aria-hidden="true">🔍</span>
         <h1>Multi Searcher</h1>
+        <button id="settingsBtn" class="header-settings-btn" title="Settings">⚙️</button>
       </div>
     </header>
 
     <main class="container">
-    <label for="searchEngine">Search Engine</label>
-    <select id="searchEngine">
-      <option value="google">Google</option>
-      <option value="duckduckgo">DuckDuckGo</option>
-      <option value="bing">Bing</option>
-      <option value="brave">Brave Search</option>
-      <option value="perplexity">Perplexity</option>
-      <option value="chatgpt">ChatGPT</option>
-      <option value="claude">Claude</option>
-      <option value="gemini">Gemini</option>
-      <option value="yandex">Yandex</option>
-    </select>
+      <section id="homeView">
+        <label for="homeSearchQuery">Search Query</label>
+        <div class="search-row">
+          <input type="text" id="homeSearchQuery" list="historyList" placeholder="Search Query" />
+          <datalist id="historyList"></datalist>
+          <button id="searchBtn">Search</button>
+        </div>
+      </section>
 
-    <label for="searchQuery">Search Query</label>
-    <div class="search-row">
-      <input type="text" id="searchQuery" list="historyList" placeholder="Search Query" />
-      <datalist id="historyList"></datalist>
-      <button id="searchBtn">Search</button>
-    </div>
+      <section id="settingsView" class="hidden">
+        <div class="settings-section">
+          <label for="settingsEngine">Search Engine</label>
+          <select id="settingsEngine">
+            <option value="google">Google</option>
+            <option value="duckduckgo">DuckDuckGo</option>
+            <option value="bing">Bing</option>
+            <option value="brave">Brave Search</option>
+            <option value="perplexity">Perplexity</option>
+            <option value="chatgpt">ChatGPT</option>
+            <option value="claude">Claude</option>
+            <option value="gemini">Gemini</option>
+            <option value="yandex">Yandex</option>
+          </select>
+        </div>
 
-    <label for="sitesTextarea">Sites (one per line)</label>
-    <textarea id="sitesTextarea"></textarea>
-    <div class="sites-actions">
-      <button id="resetBtn" type="button">Restore Defaults</button>
-    </div>
+        <div class="settings-section">
+          <label for="settingsSites">Sites (one per line)</label>
+          <textarea id="settingsSites"></textarea>
+          <div class="sites-actions">
+            <button id="resetBtn" type="button">Restore Defaults</button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <label for="settingsOpenIn">Search Behavior</label>
+          <select id="settingsOpenIn">
+            <option value="newtab">New Tab</option>
+            <option value="currenttab">Current Tab</option>
+          </select>
+          <div id="currentTabWarning" class="warning-text">
+            ⚠ Current Tab will only open the first site. Add multiple sites is only supported with New Tab.
+          </div>
+        </div>
+
+        <button id="doneBtn" class="settings-done-btn">Done</button>
+      </section>
     </main>
 
     <script>
@@ -256,17 +344,41 @@
 
       const DEFAULT_SITES = 'hdfilmcehennemi\nyoutube\nakakçe\ncimri\nepey\n';
 
-      const SITES_KEY = 'multisearcher';
-      const ENGINE_KEY = 'selectedEngine';
+      const ENGINE_KEY = 'ms_searchEngine';
+      const SITES_KEY = 'ms_sites';
+      const OPENIN_KEY = 'ms_openIn';
       const HISTORY_KEY = 'multisearcherHistory';
       const MAX_HISTORY = 10;
 
-      const engineSelect = document.getElementById('searchEngine');
-      const queryInput = document.getElementById('searchQuery');
+      const homeView = document.getElementById('homeView');
+      const settingsView = document.getElementById('settingsView');
+      const settingsBtn = document.getElementById('settingsBtn');
+      const doneBtn = document.getElementById('doneBtn');
+      const settingsEngine = document.getElementById('settingsEngine');
+      const settingsSites = document.getElementById('settingsSites');
+      const settingsOpenIn = document.getElementById('settingsOpenIn');
+      const currentTabWarning = document.getElementById('currentTabWarning');
+      const queryInput = document.getElementById('homeSearchQuery');
       const searchBtn = document.getElementById('searchBtn');
-      const sitesTextarea = document.getElementById('sitesTextarea');
       const historyList = document.getElementById('historyList');
       const resetBtn = document.getElementById('resetBtn');
+
+      const showHome = () => {
+        homeView.classList.remove('hidden');
+        settingsView.classList.add('hidden');
+        queryInput.focus();
+        queryInput.select();
+      };
+
+      const showSettings = () => {
+        settingsView.classList.remove('hidden');
+        homeView.classList.add('hidden');
+        updateCurrentTabWarning();
+      };
+
+      const updateCurrentTabWarning = () => {
+        currentTabWarning.style.display = settingsOpenIn.value === 'currenttab' ? 'block' : 'none';
+      };
 
       const getHistory = () => {
         try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
@@ -294,43 +406,52 @@
         const q = queryInput.value.trim();
         if (!q) return;
 
-        const engine = engineSelect.value;
-        const sites = sitesTextarea.value.split('\n').filter(s => s.trim());
+        const engine = settingsEngine.value;
+        const sites = settingsSites.value.split('\n').filter(s => s.trim());
+        const openIn = settingsOpenIn.value;
 
         if (engine === 'gemini') {
           alert('Gemini does not support URL query parameters.\nThe Gemini homepage will be opened.\nUse @gemini in Chrome address bar as a workaround.');
           window.open('https://gemini.google.com/');
         } else {
-          for (const site of sites) {
-            const url = ENGINES[engine](site.trim(), q);
-            window.open(url);
+          if (openIn === 'currenttab') {
+            const url = ENGINES[engine](sites[0].trim(), q);
+            window.location.href = url;
+          } else {
+            for (const site of sites) {
+              const url = ENGINES[engine](site.trim(), q);
+              window.open(url);
+            }
           }
         }
 
         addToHistory(q);
       };
 
+      settingsBtn.addEventListener('click', showSettings);
+
+      doneBtn.addEventListener('click', () => {
+        localStorage.setItem(ENGINE_KEY, settingsEngine.value);
+        localStorage.setItem(SITES_KEY, settingsSites.value);
+        localStorage.setItem(OPENIN_KEY, settingsOpenIn.value);
+        showHome();
+      });
+
+      settingsOpenIn.addEventListener('change', updateCurrentTabWarning);
+
+      resetBtn.addEventListener('click', () => {
+        if (confirm('Restore the default sites? This will replace the current list.')) {
+          settingsSites.value = DEFAULT_SITES;
+          localStorage.removeItem(SITES_KEY);
+          settingsSites.focus();
+        }
+      });
+
       queryInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') performSearch();
       });
 
       searchBtn.addEventListener('click', performSearch);
-
-      engineSelect.addEventListener('change', () => {
-        localStorage.setItem(ENGINE_KEY, engineSelect.value);
-      });
-
-      sitesTextarea.addEventListener('input', () => {
-        localStorage.setItem(SITES_KEY, sitesTextarea.value);
-      });
-
-      resetBtn.addEventListener('click', () => {
-        if (confirm('Restore the default sites? This will replace the current list.')) {
-          sitesTextarea.value = DEFAULT_SITES;
-          localStorage.removeItem(SITES_KEY);
-          sitesTextarea.focus();
-        }
-      });
 
       const setEmojiFavicon = (emoji = "🔍") => {
         const canvas = document.createElement("canvas");
@@ -347,14 +468,17 @@
       }
 
       window.addEventListener('load', () => {
-        const saved = localStorage.getItem(ENGINE_KEY);
-        if (saved && ENGINES[saved]) engineSelect.value = saved;
+        const savedEngine = localStorage.getItem(ENGINE_KEY);
+        if (savedEngine && ENGINES[savedEngine]) settingsEngine.value = savedEngine;
 
-        sitesTextarea.value = localStorage.getItem(SITES_KEY) || DEFAULT_SITES;
+        const savedSites = localStorage.getItem(SITES_KEY);
+        settingsSites.value = savedSites !== null ? savedSites : DEFAULT_SITES;
+
+        const savedOpenIn = localStorage.getItem(OPENIN_KEY);
+        if (savedOpenIn) settingsOpenIn.value = savedOpenIn;
 
         renderHistory();
-        queryInput.focus();
-        queryInput.select();
+        showHome();
 
         setEmojiFavicon("🔍");
       });
